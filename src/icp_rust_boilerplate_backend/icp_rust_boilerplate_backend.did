@@ -1,3 +1,4 @@
+
 type CropInsurance = record {
   id : nat64;
   coverage_amount : nat64;
@@ -24,6 +25,7 @@ type DebtPayload = record { debtor : text; amount : nat64; creditor : text };
 type Error = variant {
   InvalidInput : record { msg : text };
   NotFound : record { msg : text };
+  InternalError : record { msg : text };
 };
 type Escrow = record { debt_id : nat64; created_at : nat64; amount : nat64 };
 type EscrowPayload = record { debt_id : nat64; amount : nat64 };
@@ -36,18 +38,18 @@ type InsuranceClaimPayload = record {
   insurance_id : nat64;
   claim_amount : nat64;
 };
-type Result = variant { Ok : Escrow; Err : Error };
-type Result_1 = variant { Ok : CropInsurance; Err : Error };
-type Result_2 = variant { Ok : Debt; Err : Error };
+type Result = variant { Ok : Debt; Err : Error };
+type Result_1 = variant { Ok : Escrow; Err : Error };
+type Result_2 = variant { Ok : CropInsurance; Err : Error };
 type Result_3 = variant { Ok : InsuranceClaim; Err : Error };
 service : {
-  add_debt : (DebtPayload) -> (opt Debt);
-  create_escrow : (EscrowPayload) -> (Result);
-  get_crop_insurance : (nat64) -> (Result_1) query;
-  get_debt : (nat64) -> (Result_2) query;
-  get_escrow : (nat64) -> (Result) query;
+  add_debt : (DebtPayload) -> (Result);
+  create_escrow : (EscrowPayload) -> (Result_1);
+  get_crop_insurance : (nat64) -> (Result_2) query;
+  get_debt : (nat64) -> (Result) query;
+  get_escrow : (nat64) -> (Result_1) query;
   get_insurance_claim : (nat64) -> (Result_3) query;
-  purchase_crop_insurance : (CropInsurancePayload) -> (opt CropInsurance);
+  purchase_crop_insurance : (CropInsurancePayload) -> (Result_2);
   submit_insurance_claim : (InsuranceClaimPayload) -> (Result_3);
-  update_debt : (nat64, DebtPayload) -> (Result_2);
+  update_debt : (nat64, DebtPayload) -> (Result);
 }
